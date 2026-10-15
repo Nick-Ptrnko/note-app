@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ note.title }}</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f6f9; margin: 0; padding: 0; }
+        
+        /* Двоколоночний макет */
+        .wrapper { max-width: 950px; margin: 40px auto; display: flex; gap: 20px; padding: 0 20px; }
+        
+        /* Ліва колонка: Сайдбар */
+        .sidebar { width: 280px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: fit-content; }
+        .sidebar h3 { margin-top: 0; font-size: 16px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+        .note-link-item { margin-bottom: 8px; }
+        .note-link-item a { color: #007bff; text-decoration: none; font-size: 14px; display: block; padding: 6px 8px; border-radius: 4px; }
+        .note-link-item a:hover { background: #f0f4f8; }
+        
+        /* Підсвічування відкритої зараз нотатки в списку */
+        .note-link-item a.active { background: #e7f1ff; font-weight: bold; }
+        
+        /* Права колонка: Перегляд нотатки */
+        .main-content { flex: 1; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-top: 0; }
+        p { color: #555; line-height: 1.5; white-space: pre-wrap; }
+        small { color: #888; }
+        .back-link { display: inline-block; margin-top: 20px; color: #007bff; text-decoration: none; font-weight: bold; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- ЛІВА КОЛОНКА: Сайдбар з усіма заголовками -->
+        <div class="sidebar">
+            <h3>Список нотаток</h3>
+            {% if notes %}
+                {% for n in notes %}
+                    <div class="note-link-item">
+                        <!-- Якщо ID нотатки збігається з поточною, додаємо клас active -->
+                        <a href="/note/{{ n.id }}" class="{% if n.id == note.id %}active{% endif %}">
+                            #{{ n.id }} — {{ n.title }}
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #888; font-size: 13px;">Поки немає нотаток.</p>
+            {% endif %}
+        </div>
+
+        <!-- ПРАВА КОЛОНКА: Детальний перегляд обраної нотатки -->
+        <div class="main-content">
+            <div class="card">
+                <h2>#{{ note.id }} — {{ note.title }}</h2>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <p>{{ note.content }}</p>
+                <small>Створено: {{ note.created_at }}</small>
+                
+                <div>
+                    <a href="/" class="back-link">← На головну (створення)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

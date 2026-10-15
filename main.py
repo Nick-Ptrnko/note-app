@@ -1,7 +1,14 @@
 from datetime import datetime
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+app = FastAPI(title="Note Taking API")
+
+# Підключаємо пастку шаблонів Jinja2
+templates = Jinja2Templates(directory="templates")
 
 
-# 1. Клас-Сутність
 class Note:
 
     def __init__(self, note_id: int, title: str, content: str):
@@ -10,11 +17,15 @@ class Note:
         self.content: str = content
         self.created_at: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    def __repr__(self) -> str:
-        return f"<Note #{self.id}: {self.title}>"
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "content": self.content,
+            "created_at": self.created_at,
+        }
 
 
-# 2. Клас-Репозиторій
 class NoteRepository:
 
     def __init__(self):
@@ -34,55 +45,42 @@ class NoteRepository:
         return self._storage.get(note_id)
 
 
-# --- 3. ІНТЕРАКТИВНЕ КЕРУВАННЯ В КОНСОЛІ ---
-if __name__ == "__main__":
-    repo = NoteRepository()
+repo = NoteRepository()
 
-    while True:
-        print("\n=== МЕНЮ ===")
-        print("1. Створити нотатку")
-        print("2. Показати всі нотатки")
-        print("3. Прочитати нотатку за ID")
-        print("0. Вийти")
 
-        choice = input("Виберіть дію: ").strip()
+# Головна сторінка: передаємо список нотаток для лівого сайдбару
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    notes = repo.get_all()
+    return templates.TemplateResponse(
+        request, "index.html", {"notes": notes}
+    )
 
-        if choice == "1":
-            title = input("Введіть заголовок: ").strip()
-            content = input("Введіть текст нотатки: ").strip()
-            if title and content:
-                new_note = repo.add(title=title, content=content)
-                print(f" Успішно створено нотатку #{new_note.id}")
-            else:
-                print(" Заголовок і текст не можуть бути порожніми!")
 
-        elif choice == "2":
-            notes = repo.get_all()
-            if not notes:
-                print(" Список нотаток порожній.")
-            else:
-                print("\n--- Список усіх нотаток ---")
-                for note in notes:
-                    print(f"#{note.id} | {note.title} ({note.created_at})")
+# Сторінка однієї нотатки: також передаємо notes для сайдбару
+@app.get("/note/{note_id}", response_class=HTMLResponse)
+async def view_note_page(request: Request, note_id: int):
+    note = repo.get_by_id(note_id)
+    if not note:
+        raise HTTPException(status_code=404, detail="Нотатку не знайдено")
 
-        elif choice == "3":
-            raw_id = input("Введіть ID нотатки: ").strip()
-            if raw_id.isdigit():
-                note_id = int(raw_id)
-                note = repo.get_by_id(note_id)
-                if note:
-                    print(f"\n--- Нотатка #{note.id} ---")
-                    print(f"Заголовок: {note.title}")
-                    print(f"Текст:     {note.content}")
-                    print(f"Створено:  {note.created_at}")
-                else:
-                    print(f" Нотатку з ID {note_id} не знайдено.")
-            else:
-                print(" ID має бути числом!")
+    notes = repo.get_all()
+    return templates.TemplateResponse(
+        request, "detail.html", {"note": note, "notes": notes}
+    )
 
-        elif choice == "0":
-            print("До побачення!")
-            break
 
-        else:
-            print("Невідома команда, спробуйте ще раз.")
+# API ендпоінти залишаються без змін
+@app.get("/notes")
+async def get_notes():
+    return [note.to_dict() for note in repo.get_all()]
+
+
+@app.post("/notes")
+async def create_note(title: str, content: str):
+    if not title.strip() or not content.strip():
+        raise HTTPException(
+            status_code=400, detail="Заголовок та текст не можуть бути порожніми"
+        )
+    note = repo.add(title=title.strip(), content=content.strip())
+    return note.to_dict()
