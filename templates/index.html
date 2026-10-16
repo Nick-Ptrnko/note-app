@@ -2,74 +2,63 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Мої Нотатки</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects log</title>
     <style>
-        body { font-family: sans-serif; background: #f4f6f9; margin: 0; padding: 0; }
-        .wrapper { max-width: 950px; margin: 40px auto; display: flex; gap: 20px; padding: 0 20px; }
-        .sidebar { width: 280px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: fit-content; }
-        .sidebar h3 { margin-top: 0; font-size: 16px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 8px; }
-        .note-link-item { margin-bottom: 8px; }
-        .note-link-item a { color: #007bff; text-decoration: none; font-size: 14px; display: block; padding: 6px 8px; border-radius: 4px; }
-        .note-link-item a:hover { background: #f0f4f8; }
-        .main-content { flex: 1; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        input, textarea, button { display: block; width: 100%; margin-bottom: 12px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        textarea { height: 100px; resize: vertical; }
-        button { background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #218838; }
+        /* Базові стилі для мобільних: на всю ширину вікна */
+        body { 
+            font-family: sans-serif; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px 15px; 
+            background: #f4f6f9; 
+            color: #333; 
+        }
+
+        /* Для ноутбуків та планшетів додаємо гарні відступи (класні поля) */
+        @media (min-width: 768px) {
+            body {
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+        }
+
+        h1 { font-size: 24px; margin-bottom: 20px; color: #222; }
+        .create-link { display: inline-block; margin-bottom: 25px; color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
+        .create-link:hover { text-decoration: underline; }
+        .date-group { margin-bottom: 25px; }
+        .date-header { font-size: 14px; font-weight: bold; color: #666; border-bottom: 2px solid #ddd; padding-bottom: 4px; margin-bottom: 10px; }
+        ul { list-style-type: none; padding-left: 0; margin: 0; }
+        li { margin-bottom: 8px; }
+        li a { color: #007bff; text-decoration: none; font-size: 16px; }
+        li a:hover { text-decoration: underline; }
+        .empty { color: #888; font-style: italic; }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <!-- Ліва колонка: Сайдбар із заголовками -->
-        <div class="sidebar">
-            <h3>Список нотаток</h3>
-            {% if notes %}
-                {% for note in notes %}
-                    <div class="note-link-item">
-                        <a href="/note/{{ note.id }}">#{{ note.id }} — {{ note.title }}</a>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p style="color: #888; font-size: 13px;">Поки немає нотаток.</p>
-            {% endif %}
-        </div>
+    <h1>Projects log</h1>
 
-        <!-- Права колонка: Форма створення нової нотатки -->
-        <div class="main-content">
-            <div class="card">
-                <h2>Створити нотатку</h2>
-                <input type="text" id="title" placeholder="Заголовок">
-                <textarea id="content" placeholder="Текст нотатки"></textarea>
-                <button onclick="createNote()">Зберегти нотатку</button>
-            </div>
-        </div>
+    <div>
+        <a href="/create" class="create-link">+ Створити</a>
     </div>
 
-    <script>
-        async function createNote() {
-            // Отримуємо значення з полів введення
-            const title = document.getElementById('title').value.trim();
-            const content = document.getElementById('content').value.trim(); // Виправлено дужку тут!
+    {% if grouped_notes %}
+        {% for date, day_notes in grouped_notes %}
+            <div class="date-group">
+                <div class="date-header">{{ date }}</div>
+                <ul>
+                    {% for note in day_notes %}
+                        <li>
+                            <a href="/note/{{ note.id }}">{{ note.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="empty">Поки немає жодного запису.</p>
+    {% endif %}
 
-            if (!title || !content) {
-                alert('Заповніть усі поля!');
-                return;
-            }
-
-            // Робимо POST-запит до FastAPI
-            const response = await fetch(`/notes?title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`, {
-                method: 'POST'
-            });
-
-            if (response.ok) {
-                // Перезавантажуємо сторінку, щоб оновився сайдбар зліва
-                window.location.reload();
-            } else {
-                alert('Помилка при створенні нотатки');
-            }
-        }
-    </script>
 </body>
 </html>

@@ -1,11 +1,12 @@
 from datetime import datetime
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from itertools import groupby
+from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 app = FastAPI(title="Note Taking API")
 
-# Підключаємо пастку шаблонів Jinja2
+# Підключаємо папку templates для HTML-файлів
 templates = Jinja2Templates(directory="templates")
 
 
@@ -48,39 +49,48 @@ class NoteRepository:
 repo = NoteRepository()
 
 
-# Головна сторінка: передаємо список нотаток для лівого сайдбару
+# 1. Головна сторінка: список нотаток, згрупований за датами
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     notes = repo.get_all()
+
+    # Сортуємо від найновіших до найстаріших
+    sorted_notes = sorted(notes, key=lambda n: n.created_at, reverse=True)
+
+    # Групуємо нотатки за датою (перші 10 символів: "YYYY-MM-DD")
+    grouped_notes = []
+    for date, items in groupby(sorted_notes, key=lambda n: n.created_at[:10]):
+        grouped_notes.append((date, list(items)))
+
     return templates.TemplateResponse(
-        request, "index.html", {"notes": notes}
+        request, "index.html", {"grouped_notes": grouped_notes}
     )
 
 
-# Сторінка однієї нотатки: також передаємо notes для сайдбару
+# 2. Сторінка для створення нової нотатки
+@app.get("/create", response_class=HTMLResponse)
+async def create_page(request: Request):
+    return templates.TemplateResponse(request, "create.html", {})
+
+
+# 3. Сторінка перегляду конкретної нотатки
 @app.get("/note/{note_id}", response_class=HTMLResponse)
 async def view_note_page(request: Request, note_id: int):
     note = repo.get_by_id(note_id)
     if not note:
         raise HTTPException(status_code=404, detail="Нотатку не знайдено")
-
-    notes = repo.get_all()
     return templates.TemplateResponse(
-        request, "detail.html", {"note": note, "notes": notes}
+        request, "detail.html", {"note": note}
     )
 
 
-# API ендпоінти залишаються без змін
-@app.get("/notes")
-async def get_notes():
-    return [note.to_dict() for note in repo.get_all()]
-
-
+# 4. Обробка надсилання форми створення
 @app.post("/notes")
-async def create_note(title: str, content: str):
+async def create_note(title: str = Form(...), content: str = Form(...)):
     if not title.strip() or not content.strip():
         raise HTTPException(
             status_code=400, detail="Заголовок та текст не можуть бути порожніми"
         )
-    note = repo.add(title=title.strip(), content=content.strip())
-    return note.to_dict()
+    repo.add(title=title.strip(), content=content.strip())
+    # Після збереження перенаправляємо користувача назад на головну сторінку
+    return RedirectResponse(url="/", status_code=303)
