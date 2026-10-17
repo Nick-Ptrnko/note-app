@@ -22,9 +22,29 @@
             .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         }
 
-        h2 { color: #333; margin-top: 0; }
-        p { color: #555; line-height: 1.6; white-space: pre-wrap; font-size: 16px; }
+        h2 { color: #333; margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Використовуємо моноширинний шрифт для тексту нотаток, щоб дужки [] не зливалися */
+        p { 
+            color: #555; 
+            line-height: 1.6; 
+            white-space: pre-wrap; 
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 15px; 
+        }
+
         small { color: #888; }
+        
+        .edit-btn { font-size: 14px; padding: 6px 12px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-weight: normal; }
+        .edit-btn:hover { background: #5a6268; }
+
+        .linked-box { margin-top: 20px; padding: 12px 15px; background: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px; }
+        .linked-box small { display: block; margin-bottom: 6px; color: #666; font-weight: bold; }
+        .linked-list { list-style-type: none; padding-left: 0; margin: 0; }
+        .linked-list li { margin-bottom: 4px; }
+        .linked-list a { color: #007bff; text-decoration: none; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; }
+        .linked-list a:hover { text-decoration: underline; }
+
         .back-link { display: inline-block; margin-top: 20px; color: #007bff; text-decoration: none; font-weight: bold; }
         .back-link:hover { text-decoration: underline; }
     </style>
@@ -32,10 +52,33 @@
 <body>
 
     <div class="card">
-        <h2>{{ note.title }}</h2>
+        <h2>
+            {{ note.title }}
+            <a href="/note/{{ note.id }}/edit" class="edit-btn">Редагувати</a>
+        </h2>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
         <p>{{ note.content }}</p>
-        <small>Створено: {{ note.created_at }}</small>
+        
+        {% if linked_notes %}
+            <div class="linked-box">
+                <small>Пов'язані нотатки:</small>
+                <ul class="linked-list">
+                    {% for ln in linked_notes %}
+                        <li>
+                            <a href="/note/{{ ln.id }}">
+                                <!-- Універсальна SVG-іконка посилання, яка ідеально працює в усіх браузерах на Linux -->
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                {{ ln.title }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div style="margin-top: 15px;">
+            <small>Створено: {{ note.created_at }}</small>
+        </div>
         
         <div>
             <a href="/" class="back-link">← На головну</a>
