@@ -3,40 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ note.title }} — Projects log</title>
+    <title>{{ note.title }}</title>
     <style>
-        body { 
-            font-family: sans-serif; 
-            max-width: 600px; 
-            margin: 0 auto; 
-            padding: 20px 15px; 
-            background: #f4f6f9; 
-            color: #333; 
-        }
-
-        @media (min-width: 768px) {
-            body {
-                margin: 40px auto;
-                padding: 0 20px;
-            }
-            .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        }
-
-        h2 { color: #333; margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Використовуємо моноширинний шрифт для тексту нотаток, щоб дужки [] не зливалися */
-        p { 
-            color: #555; 
-            line-height: 1.6; 
-            white-space: pre-wrap; 
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            font-size: 15px; 
-        }
-
+        body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 15px; background: #f4f6f9; color: #333; }
+        @media (min-width: 768px) { body { margin: 40px auto; padding: 0 20px; } .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); } }
+        h2 { color: #333; margin-top: 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        p { color: #555; line-height: 1.6; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 15px; }
         small { color: #888; }
         
-        .edit-btn { font-size: 14px; padding: 6px 12px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-weight: normal; }
+        .actions { display: flex; gap: 8px; }
+        .edit-btn { font-size: 14px; padding: 6px 12px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-weight: normal; display: inline-block; }
         .edit-btn:hover { background: #5a6268; }
+
+        .delete-btn { font-size: 14px; padding: 6px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: normal; }
+        .delete-btn:hover { background: #c82333; }
 
         .linked-box { margin-top: 20px; padding: 12px 15px; background: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px; }
         .linked-box small { display: block; margin-bottom: 6px; color: #666; font-weight: bold; }
@@ -54,7 +34,13 @@
     <div class="card">
         <h2>
             {{ note.title }}
-            <a href="/note/{{ note.id }}/edit" class="edit-btn">Редагувати</a>
+            <div class="actions">
+                <a href="/note/{{ note.id }}/edit" class="edit-btn">Редагувати</a>
+                <!-- Форма видалення з підтвердженням -->
+                <form action="/note/{{ note.id }}/delete" method="POST" onsubmit="return confirm('Ви впевнені, що хочете видалити цей запис?');" style="margin: 0;">
+                    <button type="submit" class="delete-btn">Видалити</button>
+                </form>
+            </div>
         </h2>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
         <p>{{ note.content }}</p>
@@ -66,7 +52,6 @@
                     {% for ln in linked_notes %}
                         <li>
                             <a href="/note/{{ ln.id }}">
-                                <!-- Універсальна SVG-іконка посилання, яка ідеально працює в усіх браузерах на Linux -->
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                                 {{ ln.title }}
                             </a>
