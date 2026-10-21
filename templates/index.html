@@ -5,22 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>--- mind cards log ---</title>
     <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --border-color: #ddd;
+            --link-color: #007bff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --card-bg: #1e1e1e;
+                --text-color: #e0e0e0;
+                --text-muted: #a0a0a0;
+                --border-color: #333;
+                --link-color: #4dabf7;
+            }
+        }
+
         body { 
             font-family: sans-serif; 
             max-width: 600px; 
             margin: 0 auto; 
             padding: 20px 15px; 
-            background: #f4f6f9; 
-            color: #333; 
+            background: var(--bg-color); 
+            color: var(--text-color); 
         }
+
         @media (min-width: 768px) {
             body { margin: 40px auto; padding: 0 20px; }
         }
-        h1 { font-size: 24px; margin-bottom: 20px; color: #222; }
+
+        h1 { font-size: 24px; margin-bottom: 20px; color: var(--text-color); }
         
-        /* Стилі для блоку нагадування */
         .reminder-card {
-            background: white;
+            background: var(--card-bg);
             padding: 15px 18px;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -29,44 +50,42 @@
         }
         .reminder-card p {
             margin: 0 0 8px 0;
-            color: #444;
+            color: var(--text-color);
             white-space: pre-wrap;
             line-height: 1.5;
             font-size: 15px;
         }
         .edit-reminder {
             font-size: 13px;
-            color: #6c757d;
+            color: var(--text-muted);
             text-decoration: none;
             font-weight: bold;
         }
         .edit-reminder:hover {
             text-decoration: underline;
-            color: #007bff;
+            color: var(--link-color);
         }
 
-        .create-link { display: inline-block; margin-bottom: 25px; color: #007bff; text-decoration: none; font-weight: bold; font-size: 16px; }
+        .create-link { display: inline-block; margin-bottom: 25px; color: var(--link-color); text-decoration: none; font-weight: bold; font-size: 16px; }
         .create-link:hover { text-decoration: underline; }
         .date-group { margin-bottom: 25px; }
-        .date-header { font-size: 14px; font-weight: bold; color: #666; border-bottom: 2px solid #ddd; padding-bottom: 4px; margin-bottom: 10px; }
+        .date-header { font-size: 14px; font-weight: bold; color: var(--text-muted); border-bottom: 2px solid var(--border-color); padding-bottom: 4px; margin-bottom: 10px; }
         ul { list-style-type: none; padding-left: 0; margin: 0; }
         li { margin-bottom: 8px; }
-        li a { color: #007bff; text-decoration: none; font-size: 16px; }
+        li a { color: var(--link-color); text-decoration: none; font-size: 16px; }
         li a:hover { text-decoration: underline; }
-        .empty { color: #888; font-style: italic; }
+        .empty { color: var(--text-muted); font-style: italic; }
     </style>
 </head>
 <body>
 
     <h1>--- mind cards log ---</h1>
 
-    <!-- Блок довільного нагадування -->
     <div class="reminder-card">
         <p>{{ reminder }}</p>
         <a href="/reminder/edit" class="edit-reminder">змінити</a>
     </div>
 
-    <!-- Посилання на сторінку створення -->
     <div>
         <a href="/create" class="create-link">+ Створити</a>
     </div>

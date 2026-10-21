@@ -5,11 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ note.title }}</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 15px; background: #f4f6f9; color: #333; }
-        @media (min-width: 768px) { body { margin: 40px auto; padding: 0 20px; } .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); } }
-        h2 { color: #333; margin-top: 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        p { color: #555; line-height: 1.6; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 15px; }
-        small { color: #888; }
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #888888;
+            --border-color: #eee;
+            --box-bg: #f8f9fa;
+            --link-color: #007bff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --card-bg: #1e1e1e;
+                --text-color: #e0e0e0;
+                --text-muted: #a0a0a0;
+                --border-color: #333;
+                --box-bg: #252525;
+                --link-color: #4dabf7;
+            }
+        }
+
+        body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 15px; background: var(--bg-color); color: var(--text-color); }
+        @media (min-width: 768px) { body { margin: 40px auto; padding: 0 20px; } .card { background: var(--card-bg); padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); } }
+        h2 { color: var(--text-color); margin-top: 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        p { color: var(--text-color); line-height: 1.6; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 15px; opacity: 0.9; }
+        small { color: var(--text-muted); }
         
         .actions { display: flex; gap: 8px; }
         .edit-btn { font-size: 14px; padding: 6px 12px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-weight: normal; display: inline-block; }
@@ -18,14 +40,14 @@
         .delete-btn { font-size: 14px; padding: 6px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: normal; }
         .delete-btn:hover { background: #c82333; }
 
-        .linked-box { margin-top: 20px; padding: 12px 15px; background: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px; }
-        .linked-box small { display: block; margin-bottom: 6px; color: #666; font-weight: bold; }
+        .linked-box { margin-top: 20px; padding: 12px 15px; background: var(--box-bg); border-left: 4px solid var(--link-color); border-radius: 4px; }
+        .linked-box small { display: block; margin-bottom: 6px; color: var(--text-muted); font-weight: bold; }
         .linked-list { list-style-type: none; padding-left: 0; margin: 0; }
         .linked-list li { margin-bottom: 4px; }
-        .linked-list a { color: #007bff; text-decoration: none; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; }
+        .linked-list a { color: var(--link-color); text-decoration: none; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; }
         .linked-list a:hover { text-decoration: underline; }
 
-        .back-link { display: inline-block; margin-top: 20px; color: #007bff; text-decoration: none; font-weight: bold; }
+        .back-link { display: inline-block; margin-top: 20px; color: var(--link-color); text-decoration: none; font-weight: bold; }
         .back-link:hover { text-decoration: underline; }
     </style>
 </head>
@@ -36,13 +58,12 @@
             {{ note.title }}
             <div class="actions">
                 <a href="/note/{{ note.id }}/edit" class="edit-btn">Редагувати</a>
-                <!-- Форма видалення з підтвердженням -->
                 <form action="/note/{{ note.id }}/delete" method="POST" onsubmit="return confirm('Ви впевнені, що хочете видалити цей запис?');" style="margin: 0;">
                     <button type="submit" class="delete-btn">Видалити</button>
                 </form>
             </div>
         </h2>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
         <p>{{ note.content }}</p>
         
         {% if linked_notes %}

@@ -3,16 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Змінити нагадування</title>
+    <title>Редагувати</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 15px; background: #f4f6f9; color: #333; }
-        @media (min-width: 768px) { body { margin: 40px auto; padding: 0 20px; } .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); } }
-        h2 { margin-top: 0; font-size: 20px; }
-        textarea, button { display: block; width: 100%; margin-bottom: 12px; padding: 12px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #ccc;
+            --input-bg: #ffffff;
+            --link-color: #007bff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --card-bg: #1e1e1e;
+                --text-color: #e0e0e0;
+                --border-color: #444;
+                --input-bg: #2a2a2a;
+                --link-color: #4dabf7;
+            }
+        }
+
+        body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px 15px; background: var(--bg-color); color: var(--text-color); }
+        @media (min-width: 768px) { body { margin: 40px auto; padding: 0 20px; } .card { background: var(--card-bg); padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); } }
+        h2 { margin-top: 0; font-size: 20px; color: var(--text-color); }
+        textarea, button { display: block; width: 100%; margin-bottom: 12px; padding: 12px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 4px; font-size: 16px; background: var(--input-bg); color: var(--text-color); }
         textarea { height: 120px; resize: vertical; }
         button { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background-color: #0056b3; }
-        .back-link { display: inline-block; margin-top: 15px; color: #007bff; text-decoration: none; font-weight: bold; }
+        .back-link { display: inline-block; margin-top: 15px; color: var(--link-color); text-decoration: none; font-weight: bold; }
         .back-link:hover { text-decoration: underline; }
     </style>
 </head>
